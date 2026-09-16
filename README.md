@@ -177,3 +177,23 @@ The names given to some of our examples in the results table differ from the one
 | lj2           | Sum           |
 | lj3           | AbsDiv        |
 | lj4           | Car           |
+
+
+## List of intentional bugs
+
+One of our evaluation criteria being the behavior of the tools on faulty programs, we intentionally introduced bugs on some of our examples. Here is a list of those (the non-obvious ones are also indicated directly in the source code):
+- ArrayMap, put: `<=` instead of `<` in the loop condition, causing `i` to possibly be out-of-bounds for the arrays
+- Date, previousDay: `this.month() + 1` instead of `this.month() - 1` (simulating a copy-paste error)
+- Time, moveBy: normalization of hours to 60 instead of 24
+- FilterLess, filterLessThan_adHoc_buggy and filterLessThan_functional_buggy: the inequality in the filtering condition should be strict
+- IC4, getThirdElement_1_buggy and getThirdElement_2_buggy: array access at index 3 for an array of length possibly less than 4
+- IC5, lessThan_buggy: variable `i` is decremented instead of incremented
+- IC7, removeSubstring_buggy: no check that indexOf returned a non-negative value (it returns -1 if the element is not found, which is not a valid index for the subsequent call to substring)
+- LJ1, fib_original: the refinement `>= n` on the result does not hold (as mentioned in the comments, we did not find a way of expressing this constraint using the Checker Framework)
+- LJ2, sum_original: same issue as LJ1, and here as well the Checker Framework fails to express the constraint
+- LJ3, absDiv_buggy: does not force the divisor to be non-zero
+- LJ4, test_buggy: passing 998 as an argument to method setYear, which expects a value >= 1801
+- PositiveMax, maxPos_buggy: loop condition should use `<` instead of `<=`
+- PositiveMax, maxPos_moreComplex_buggy: `incOdd` is allowed to be negative, thus `k` is not guaranteed to be a valid index for the array
+- MergeSort, merge: decrementing `j` instead of incrementing it in the second branch of the if-elseif
+

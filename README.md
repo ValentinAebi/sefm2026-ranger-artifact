@@ -1,6 +1,6 @@
 # Replication
 
-This repository serves as an artifact for the paper Practical Range Refinement Types with Inference (SEFM 2026).
+This repository serves as an artifact for the paper *Practical Range Refinement Types with Inference* (SEFM 2026).
 
 
 ## Directory structure

@@ -1,53 +1,179 @@
-# Range verification examples
+# Replication
 
-This repository contains example programs demonstrating refinement types, in particular dependent range types. It serves as a comparison of the [Licorne](https://github.com/ValentinAebi/licorne-lang) experimental programming language with the following type refinement systems:
-
-- The Java Checker Framework: [https://checkerframework.org/](https://checkerframework.org/) (more precisely the Index Checker and the Constants Checker)
-- LiquidJava: [https://liquid-java.github.io/](https://liquid-java.github.io/)
-
-Examples `ic4`, `ic5`, `ic7`, and `ic9` are taken from the [manual of the Checker Framework](https://checkerframework.org/manual/) (sections 11.4, 11.5, 11.7, and 11.9, respectively). Examples `lj1` and `lj2` are taken from the [examples repository of LiquidJava](https://github.com/liquid-java/liquidjava-examples), `lj3` from the [Open VSX page of the LiquidJava VS Code extension](https://open-vsx.org/extension/AlcidesFonseca/liquid-java), and `lj4` from the [test suite of LiquidJava](https://github.com/liquid-java/liquidjava/tree/main/liquidjava-example/src/main/java/testSuite).
-
-## Examples table
-
-Click on the color circles to go to the corresponding example code. Click on the example row header to go to the original version of the example (except for the examples that we created ourselves).
-
-|                                                                                                                                      | Licorne                                                          | Java Checker Framework                                                                                          | LiquidJava                                                                 | Scala                                           |
-|--------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------|----------------|------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------|
-|Motivating example (Decoder)                                                                                                          |[🟢](./licorne/motivation/Decoder.lic)                            |[🟠🟡 (4x `@AssumeAssertion`)](./java-checker-framework/src/main/java/org/example/motivation/Decoder.java)                          |[🔴 (refinements not checked in generics)](./liquid-java/src/main/java/motivation/Decoder.java) |[✔](./scala/src/main/scala/motivation/main.scala) |
-|[Mergesort](https://github.com/TheAlgorithms/Java/blob/master/src/main/java/com/thealgorithms/sorts/MergeSort.java)                   |[🟡 (1x `!!`)](./licorne/sorting/MergeSort.lic)                 |[🟡 (3x `@AssumeAssertion`)](./java-checker-framework/src/main/java/org/example/sorting/MergeSort.java)                                  |[❌](./liquid-java/src/main/java/sorting/MergeSort.java)         | [✔](./scala/src/main/scala/sorting/MergeSort.scala)             |
-|[ArrayMap](https://github.com/plume-lib/plume-util/blob/master/src/main/java/org/plumelib/util/ArrayMap.java)*                        |[🟢](./licorne/arraymap/maps/ArrayMap.lic)                        |[🟢](./java-checker-framework/src/main/java/org/example/arraymap/ArrayMap.java)                                      | Not attempted                                                                | [✔](./scala/src/main/scala/arraymap/ArrayMap.scala)                  |
-|DateTime                                                                                                                              |[🟢](./licorne/datetime/)                                         | [🔵 (bounds on day value can only be constants)](./java-checker-framework/src/main/java/org/example/datetime) |[🔴 (incorrect handling of `%`?)](./liquid-java/src/main/java/datetime/MutTime.java) | [✔](./scala/src/main/scala/datetime/) |
-|filterLessThan                                                                                                                        |[🟢](./licorne/filterLess/Example.lic)                        |[🔴🟠 (Java version mismatch?)](./java-checker-framework/src/main/java/org/example/filterlessthan/FilterLess.java)    | Not attempted                                                                     | [✔](./scala/src/main/scala/filterLess/FilterLess.scala) |
-| Positive maximum                                                                                                                     | [🟢](./licorne/maxpos/PositiveMax.lic)                           | [🟢](./java-checker-framework/src/main/java/org/example/maxpos/PositiveMax.java)                                  | [❌](./liquid-java/src/main/java/maxpos/PositiveMax.java)            |            [✔](./scala/src/main/scala/maxpos/maxpos.scala) |
-|[IC4](https://checkerframework.org/manual/#index-minlen) (ThirdElem)                                                                  |[🟢](./licorne/ic4/checker_framework_11_4.lic)                    |[🟢](./java-checker-framework/src/main/java/org/example/ic4/IC4.java)                                                 |[🔴 (does not check array indexing)](./liquid-java/src/main/java/ic4/IC4.java)  | [✔](./scala/src/main/scala/ic4/ic_11_4.scala) |
-|[IC5](https://checkerframework.org/manual/#index-samelen) (ArrayLess)                                                                 |[🟢](./licorne/ic5/checker_framework_11_5.lic)                    |[🟢](./java-checker-framework/src/main/java/org/example/ic5/IC5.java)                                                 |[🔴 (does not check array indexing)](./liquid-java/src/main/java/ic5/IC5.java) | [✔](./scala/src/main/scala/ic5/ic_11_5.scala)  |
-|[IC7](https://checkerframework.org/manual/#index-substringindex) (RemString)                                                          |[🟢](./licorne/ic7/checker_framework_11_7.lic)                    |[🟢](./java-checker-framework/src/main/java/org/example/ic7/IC7.java)                                                 |[❌](./liquid-java/src/main/java/ic7/IC7.java)                                 | [✔](./scala/src/main/scala/ic7/ic_11_7.scala)  |
-|[IC9](https://checkerframework.org/manual/#index-annotating-fixed-size) (ArrayWrap)                                                   |[🟢](./licorne/ic9/ArrayWrapper.lic)                              |[🟡 (1x `@SuppressWarnings("index")`)](./java-checker-framework/src/main/java/org/example/ic9/ArrayWrapper.java)          |[❌](./liquid-java/src/main/java/ic9/ArrayWrapper.java)                        | [✔](./scala/src/main/scala/ic9/ArrayWrapper.scala) |
-|[LJ1](https://github.com/liquid-java/liquidjava-examples/blob/main/user_study_23/part3-liquidJava/together1/src/together1/Test1.java) (Fibonacci) |[🟢](./licorne/lj1/fibonacci.lic)                                 |[🔵 (cannot express the (wrong) specification `fib(n) >= n`)](./java-checker-framework/src/main/java/org/example/lj1/Test1.java) |[🔴 (`fib(2)` = 1, violating `fib(n) >= n` also in the recursive case)](./liquid-java/src/main/java/lj1/Test1.java)  | [✔](./scala/src/main/scala/lj1/lj1.scala) |
-|[LJ2](https://github.com/liquid-java/liquidjava-examples/blob/main/user_study_23/part3-liquidJava/together2/src/together2/Test1.java) (Sum) |[🟢](./licorne/lj2/sum.lic)                                       |[🔵 (cannot express sum(n) >= n)](./java-checker-framework/src/main/java/org/example/lj2/Test2.java)                       |[🟢](./liquid-java/src/main/java/lj2/Test2.java)                               | [✔](./scala/src/main/scala/lj2/lj2.scala)   |
-|[LJ3](https://open-vsx.org/extension/AlcidesFonseca/liquid-java#refinements) (AbsDiv)                                                 |[🔵 (ternary not allowed in predicate)](./licorne/lj3/example.lic)| [🔵 (does not enforce divisor != 0)](./java-checker-framework/src/main/java/org/example/lj3/Test3.java) |[🟢](./liquid-java/src/main/java/lj3/Test3.java)                                               | [✔](./scala/src/main/scala/lj3/lj3.scala)    |
-|[LJ4](https://github.com/liquid-java/liquidjava/tree/main/liquidjava-example/src/main/java/testSuite/classes/car_correct) (Car)       |[🟢](./licorne/lj4/Test.lic)                                      | [🟢](./java-checker-framework/src/main/java/org/example/lj4/Test.java)                                                 |[🟢](./liquid-java/src/main/java/lj4/Test.java)                                | [✔](./scala/src/main/scala/lj4/test.scala)  |
-
-*: the ArrayMap example is inspired from the code that the hyperlink points to (which is annotated using the Checker Framework) but significantly simplified. In particular, in our version, the size of the array-map is fixed.
-
-🟢 = succeeds without casts or assertions
-
-🔵 = succeeds without casts or assertions, but some precision is lost
-
-🟡 = succeeds with casts or assertions
-
-🟠 = too conservative: fails because of false positives that cannot be ignored using casts or assertions
-
-🔴 = unsound: has false negatives
-
-❌ = the verifier crashes
+This repository serves as an artifact for the paper Practical Range Refinement Types with Inference (SEFM 2026).
 
 
-## Running the type-checkers
+## Directory structure
 
-Licorne: in the [`licorne` directory](./licorne), run `java -jar licorne-compiler.jar compile <files or directory>`, e.g. `java -jar .\licorne-compiler.jar compile .\arraymap\` (you need [Java](https://www.oracle.com/de/java/technologies/downloads), we tested with version 25)
+```text
+/
+|_ README.md .................................... [CURRENT FILE] Contains the replication instructions, please start from here
+|_ Dockerfile .................................................. The Dockerfile that we used to generate the image
+|_ ranger-image.tar ............................................ Docker image (available in the Figshare repository only)
+|_ examples/
+    |_ java-checker-framework/ ................................. Checker Framework version of our examples
+    |   |_ pom.xml ............................................. Maven configuration file
+    |   |_ src/main/java/org/example/
+    |       |_ arraymap/ ....................................... Every package corresponds to one example
+    |       |   |_ ArrayMap.java
+    |       |   |_ ArrayUtils.java
+    |       |_ datetime/
+    |       |   |_ ...
+    |       |_ ...
+    |_ licorne/ ................................................ Licorne/Ranger version of our examples
+    |   |_ arraymap/ ........................................... Every subfolder corresponds to one example
+    |   |   |_ arrays/Array.lic ................................ Some examples are split into packages
+    |   |   |_ maps/
+    |   |   |   |_ ArrayMap.lic
+    |   |   |   |_ Map.lic
+    |   |   |_ general_aliases.lic
+    |   |   |_ OrderedCollections.lic
+    |   |_ datetime/
+    |   |   |_ ...
+    |   |_ ...
+    |_ liquid-java/ ............................................ LiquidJava version of our examples
+    |   |_ src/main/java/
+    |   |   |_ datetime ........................................ Every package corresponds to one example
+    |   |   |   |_ ...
+    |   |   |_ ...
+    |_ scala/ .................................................. Scala version of our examples
+    |   |_ build.sbt ........................................... SBT (Scala Build Tool) configuration file
+    |   |_ src/main/scala/
+    |   |   |_ arraymap/ ....................................... Every package corresponds to one example
+    |   |   |   |_ ArrayMap.scala
+    |   |   |_ ...
+    |_ scripts/ ................................................ Automation scripts
+    |   |_ comparison_script.py ................................ Script that collects the data in the formal comments and builds the results table
+    |   |_ timing_script.py .................................... Script that runs and times the Ranger and Scala type-checkers
+    |   |_ formal_comments_explanation.txt ..................... Description of the system of formal comments that we use
+```
 
-Checker Framework: in the [`java-checker-framework` directory](./java-checker-framework), run `mvn clean compile` (you will need [Maven](https://maven.apache.org/))
 
-LiquidJava: the simplest way seems to be to use the [VS Code extension](https://open-vsx.org/extension/AlcidesFonseca/liquid-java)
+## Links to referenced tools
+- Licorne: https://github.com/ValentinAebi/licorne-lang/
+- Java Checker Framework: https://checkerframework.org/
+- LiquidJava: https://liquid-java.github.io/
 
+
+## Sources of the examples
+
+Examples `ic4`, `ic5`, `ic7`, and `ic9` are taken from the [manual of the Checker Framework](https://checkerframework.org/manual/) (sections 11.4, 11.5, 11.7, and 11.9, respectively). Examples `lj1` and `lj2` are taken from the [examples repository of LiquidJava](https://github.com/liquid-java/liquidjava-examples), `lj3` from the [Open VSX page of the LiquidJava VS Code extension](https://open-vsx.org/extension/AlcidesFonseca/liquid-java), and `lj4` from the [test suite of LiquidJava](https://github.com/liquid-java/liquidjava/tree/main/liquidjava-example/src/main/java/testSuite). Other examples were made by us.
+
+
+## Reproducibility claims
+
+We claim the *available* and *functional* badges, as well as the following functional outcomes.
+
+F1 - Our [timing script](./examples/scripts/timing_script.py), which typechecks all examples in Ranger and Scala, shows that Ranger can check programs in a practical amount of time, while clearly and precisely reporting errors. This supports our claims in the last paragraph of the evaluation section (section 5) of the paper.
+
+F2 - Ranger code examples, together with our [comparison script](./examples/scripts/comparison_script.py) that analyzes the formal comments we wrote next to code units, show that Ranger can typecheck all of our 14 examples without annotations besides the ones in method signatures and with a single use of the hybrid cast operator. This reproduces the results displayed in table 2 in the paper. We additionally provide a [description of our system of formal comments](./examples/scripts/formal_comments_explanation.txt).
+
+
+## Steps to reproduce
+
+1. Load the Docker image:
+```sh
+docker load -i ranger-image.tar
+```
+Alternatively, you can pull the image from DockerHub:
+```
+docker pull aebiv/ranger-image
+```
+Or build it from the [Dockerfile](./examples/Dockerfile):
+```
+docker build -t "aebiv/ranger-image" .
+```
+
+
+2. Run the image:
+```sh
+docker run -it aebiv/ranger-image
+```
+
+**Note**: This image was built on an x64-based machine. We tested on a Windows 11 and an Ubuntu 24.04 LTS Linux machines. You should be able to run it also on a Mac with the `--platform linux/amd64` emulation option, but performance may worsen. Alternatively, consider locally building the image from the Dockerfile (see instructions above).
+
+You may want to perform the following sanity checks:
+- `javac -version` should output `javac 25.0.3`
+- `scalac -version` should output `Scala compiler version 3.8.2 -- Copyright 2002-2026, LAMP/EPFL`.
+
+3. To type-check all Licorne and Scala examples at once, navigate to the `scripts` directory:
+```sh
+cd /opt/ranger-examples/scripts/
+```
+then run the timing script:
+```sh
+python3 timing_script.py
+```
+The script displays the compilation times while running, and writes the stdout and stderr outputs, as well as the compilation times, to files in the `/opt/ranger-examples/scripts/timing-runs` directory. The Licorne compiler prints errors to stderr, while the stdout file will contain only "Compiler not implemented" messages, which merely mean that the compiler stopped after type-checking because we currently have no backend.
+
+**Note**: in the paper, we indicate that Licorne took 16s to compile all examples, while Scala took 34s. We obtained these results on a Windows machine (Lenovo ThinkPad, Windows 11, 64GB RAM, Intel Core Ultra 9 2.3 GHz). When running the same experiments on the same machine but using the Ubuntu-based Docker image, we got about the same compilation time for Licorne (15s), but the Scala compilation times fell down to about 21s. While we don't know the exact reason of this difference, this still supports the claim that we make in the paper that Ranger's typechecking process is fast enough to be practically usable.
+
+4. To run the Checker Framework on all examples, navigate to the `java-checker-framework` directory:
+```sh
+cd /opt/ranger-examples/java-checker-framework
+```
+then compile the project (this automatically runs the Checker Framework):
+```sh
+mvn clean compile
+```
+Running this command for the first time will pull data from the Internet, so you'll need Internet connectivity for that part.
+
+Issues found by the Checker Framework will be displayed in the console, so it is normal to get "ERROR" messages (we expect 21 of them, and it is expected that they get displayed twice).
+
+5. To run the script that collects the formal comments in all units and builds the results table (table 2 in the paper), navigate to the `scripts` directory:
+```sh
+cd /opt/ranger-examples/scripts/
+```
+then run the script:
+```sh
+python3 comparison_script.py
+```
+We added the formal comments manually. Some are based on the verification results displayed by the tools, others are based on manual annotation counting. A precise description of the formal comments system that we used can be found in the [dedicated file](./examples/scripts/formal_comments_explanation.txt). The script additionally runs consistency checks and outputs some warnings to the console, referring to the fact that some units are not implemented in LiquidJava and other units are marked as "buggy" in the implementation in one of the frameworks but not in another framework. This is expected, because some annotations that one tool fails to verify may be inexpressible in another tool. The script also outputs a LaTeX version of the table to the console, and a CSV version to a file in the `out` directory. To display it:
+```sh
+cat /opt/ranger-examples/scripts/out/table.csv
+```
+
+
+## Verifying a single Ranger example
+
+If you want to verify a single Licorne program, navigate to the `licorne` directory:
+```sh
+cd /opt/ranger-examples/licorne
+```
+then run the type-checker:
+```sh
+java -jar licorne-compiler.jar compile <example name>
+```
+E.g.:
+```sh
+java -jar licorne-compiler.jar compile arraymap/
+```
+
+
+## Verifying programs using LiquidJava
+
+We used the LiquidJava VSCode extension to analyze programs using LiquidJava. VSCode and its LiquidJava extension are not installed in the Docker image, but should be easy to install on nearly any machine. If you want to replicate the results that we obtained using LiquidJava, install the LiquidJava VSCode extension from [its Visual Studio Marketplace page](https://marketplace.visualstudio.com/items?itemName=AlcidesFonseca.liquid-java), and open the file that you want to verify. LiquidJava will display error messages next to the code that it cannot verify. The Visual Studio Marketplace page of LiquidJava also provides additional information about the tool.
+
+
+## Additional information about our experiments
+
+We partitioned the code into *units* (most units are functions). Every unit is annotated according to a system of formal comments, whose precise description can be found [here](./examples/scripts/formal_comments_explanation.txt). 
+The annotations specify, among others, the number of annotations used in that unit, whether or not the unit contains one or more bug(s), and whether or not the tool flags the unit (i.e. reports one or more bug(s) in that particular unit). 
+Our [comparison script](./examples/scripts/comparison_script.py) traverses all files and collects the information specified by the formal comments. It outputs this information as a table, corresponding to table 2 in the paper. 
+It dumps the LaTeX code of the table to the console, and produces a [CSV version](./examples/scripts/out/table.csv) in the [`scripts/out`](./examples/scripts/out/) directory (of course the links work only after the table has been generated).
+
+
+## Note about the name of some experiments
+
+The names given to some of our examples in the results table differ from the ones we give them in the source files. The following table maps both versions of the names to each other:
+| Name in files | Name in table |
+|---------------|---------------|
+| Motivation    | Decoder       |
+| ic4           | ThirdElem     |
+| ic5           | ArrayLess     |
+| ic7           | RemString     |
+| ic9           | ArrayWrap     |
+| lj1           | Fibonacci     |
+| lj2           | Sum           |
+| lj3           | AbsDiv        |
+| lj4           | Car           |

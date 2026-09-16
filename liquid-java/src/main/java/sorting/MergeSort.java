@@ -10,26 +10,30 @@ import java.util.Arrays;
 import java.util.function.BiFunction;
 
 /*
- * We are currently unable to verify this example using LiquidJava. After LiquidJava crashed on the initial version of this example, 
- * we tried to simplify the code (e.g. by replacing generics with ints). We ended up with this version, where LiquidJava does not 
- * crash anymore, but fails to verify. We also tried to replace the refinement aliases with their complete definition at use-site, 
- * but in that case the verifier crashed.
+ * After encountering crashes when trying to verify the original version of this code using LiquidJava,
+ * we simplified it by avoiding the use of generics.
  */
 
 
-@RefinementAlias("IndexFor(int idx, Object[] arr) { 0 <= idx && idx < arr.length }")
+@RefinementAlias("IndexFor(int idx, int[] arr) { 0 <= idx && idx < length(arr) }")
 @SuppressWarnings("rawtypes")
 class MergeSort {
 
-    public static void sort(int[] unsorted, BiFunction<Integer, Integer, Boolean> lessThan) {     //> MergeSort::sort p=(2,0,0/0) r=none FAIL
+    public static void sort(int[] unsorted, BiFunction<Integer, Integer, Boolean> lessThan) {     //> MergeSort::sort p=(2,0,0/0) r=none
         if (unsorted.length <= 0) {
             return;
         }
-        int[] tempArray = Arrays.copyOf(unsorted, unsorted.length);
+        int[] tempArray = arrayCopy(unsorted);
         doSort(unsorted, tempArray, lessThan, 0, unsorted.length - 1);
     }
 
-    private static void doSort(int[] arr, int[] tempArray, BiFunction<Integer, Integer, Boolean> lessThan, @Refinement("IndexFor(_, arr) && IndexFor(_, tempArray)") int left, @Refinement("IndexFor(_, arr) && IndexFor(_, tempArray)") int right) {  //> MergeSort::doSort p=(5,2,8/8) r=none FAIL
+    private static void doSort(
+        int[] arr,
+        int[] tempArray,
+        BiFunction<Integer, Integer, Boolean> lessThan,
+        @Refinement("IndexFor(_, arr) && IndexFor(_, tempArray)") int left,
+        @Refinement("IndexFor(_, arr) && IndexFor(_, tempArray)") int right
+    ) {  //> MergeSort::doSort p=(5,2,8/8) r=none
         if (left < right) {
             int mid = (left + right) / 2;
             doSort(arr, tempArray, lessThan, left, mid);
@@ -39,7 +43,14 @@ class MergeSort {
     }
 
     @SuppressWarnings("unchecked")  //> MergeSort::merge p=(6,3,13/13) r=none BUG
-    private static void merge(int[] arr, int[] tempArray, BiFunction<Integer, Integer, Boolean> lessThan, @Refinement("IndexFor(_, arr) && IndexFor(_, tempArray)") int left, @Refinement("IndexFor(_, arr) && IndexFor(_, tempArray)") int mid, @Refinement("IndexFor(_, arr) && IndexFor(_, tempArray) && left < _") int right) {
+    private static void merge(
+        int[] arr,
+        int[] tempArray,
+        BiFunction<Integer, Integer, Boolean> lessThan,
+        @Refinement("IndexFor(_, arr) && IndexFor(_, tempArray)") int left,
+        @Refinement("IndexFor(_, arr) && IndexFor(_, tempArray)") int mid,
+        @Refinement("IndexFor(_, arr) && IndexFor(_, tempArray) && left < _") int right
+    ) {
         int i = left;
         int j = mid + 1;
         System.arraycopy(arr, left, tempArray, left, right + 1 - left);
@@ -56,4 +67,13 @@ class MergeSort {
             }
         }
     }
+
+    private static @Refinement("length(_) == length(input)") int[] arrayCopy(int[] input) {
+        int[] copy = new int[input.length];
+        for (int i = 0; i < input.length; i++) {
+            copy[i] = input[i];
+        }
+        return copy;
+    }
+
 }

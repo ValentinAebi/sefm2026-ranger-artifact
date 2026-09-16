@@ -6,14 +6,16 @@ import liquidjava.specification.RefinementAlias;
 
 /** ArrayWrapper is a fixed-size generic collection. */
 public class ArrayWrapper<T> {
-    private final Object @Refinement("_.length == this.size()") [] delegate;
+    private final @Refinement("_ >= 0") int size;
+    private final Object[] delegate;
 
     ArrayWrapper(@Refinement("_ >= 0") int size) {  //> ArrayWrapper::constructor p=(1,1,1/1) r=none
-        delegate = new Object[size];
+        this.size = size;
+        this.delegate = new Object[size];
     }
 
     public @Refinement("_ >= 0") int size() {     //> ArrayWrapper::size p=(0,0,0/0) r=(1,1/1)
-        return delegate.length;
+        return size;
     }
 
     public void set(@Refinement("0 <= _ && _ < this.size()") int index, T obj) {    //> ArrayWrapper::set p=(2,1,2/2) r=none

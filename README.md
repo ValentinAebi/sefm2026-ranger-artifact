@@ -50,7 +50,7 @@ This repository serves as an artifact for the paper *Practical Range Refinement 
 
 
 ## Links to referenced tools
-- Licorne: https://github.com/ValentinAebi/licorne-lang/
+- Licorne: https://github.com/ValentinAebi/licorne-lang/ (Ranger is implemented in Licorne's type system)
 - Java Checker Framework: https://checkerframework.org/
 - LiquidJava: https://liquid-java.github.io/
 

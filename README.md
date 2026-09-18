@@ -8,9 +8,9 @@ This repository serves as an artifact for the paper *Practical Range Refinement 
 ```text
 /
 |_ README.md .................................... [CURRENT FILE] Contains the replication instructions, please start from here
-|_ Dockerfile .................................................. The Dockerfile that we used to generate the image
 |_ ranger-image.tar ............................................ Docker image (available in the Figshare repository only)
 |_ examples/
+    |_ Dockerfile .................................................. The Dockerfile that we used to generate the image
     |_ java-checker-framework/ ................................. Checker Framework version of our examples
     |   |_ pom.xml ............................................. Maven configuration file
     |   |_ src/main/java/org/example/
